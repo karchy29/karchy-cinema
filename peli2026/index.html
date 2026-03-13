@@ -60,11 +60,9 @@
         
         iframe { background: black; }
 
-        /* Keyframes para animaciones que tenías */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
 
-        /* Ajustes Responsivos Críticos */
         @media (max-width: 640px) {
             .hero-banner { height: 55vh; }
             #heroTitle { font-size: 2.2rem !important; }
@@ -88,11 +86,8 @@
         
         <div class="flex items-center gap-2 md:gap-4">
             <input type="text" id="mainSearch" placeholder="Buscar..." class="search-input">
-            
             <button onclick="toggleKids()" id="btnKids" class="bg-blue-600 px-3 md:px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black border border-white/10 shrink-0">KIDS</button>
-            
             <div onclick="toggleMenuPerfiles()" class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-red-600 flex items-center justify-center font-black cursor-pointer shadow-lg border-2 border-white/20 shrink-0">K</div>
-            
             <div id="menuPerfiles">
                 <div id="contenedorPerfiles"></div>
             </div>
@@ -111,10 +106,7 @@
 
     <main class="p-8 lg:px-20">
         <h2 id="sectionTitle" class="text-xl font-black uppercase tracking-widest mb-10 border-l-4 border-red-600 pl-4">Recomendados para ti</h2>
-        
-        <div id="gridPeliculas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            </div>
-
+        <div id="gridPeliculas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
         <div id="loading" class="py-20 text-center hidden">
             <i class="fa fa-circle-notch fa-spin text-red-600 text-4xl"></i>
         </div>
@@ -127,12 +119,12 @@
                 <div id="controlesPlayer" class="flex gap-2">
                     <button onclick="cambiarMotor(1)" id="btnM1" class="btn-servidor active">LATINO 1</button>
                     <button onclick="cambiarMotor(2)" id="btnM2" class="btn-servidor">LATINO 2</button>
-                    <button onclick="cambiarMotor(3)" id="btnM3" class="btn-servidor">ESTÁNDAR (Multi)</button>
+                    <button onclick="cambiarMotor(3)" id="btnM3" class="btn-servidor">LATINO 3 (Multi)</button>
                 </div>
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-[9px] text-green-500 font-bold uppercase animate-pulse">
-                    <i class="fa fa-check"></i> Auto-idioma: ES-LATAM
+                    <i class="fa fa-check"></i> PRIORIDAD: ESPAÑOL LATINO
                 </span>
                 <button onclick="cerrarPlayer()" class="bg-white/10 hover:bg-red-600 text-white px-5 py-1.5 rounded-full text-[10px] font-black transition">SALIR</button>
             </div>
@@ -150,13 +142,11 @@
                     <h2 id="modalTitle" class="text-3xl font-black italic uppercase">Título</h2>
                     <button onclick="cerrarModal()" class="text-3xl text-zinc-600">&times;</button>
                 </div>
-                
                 <div id="contSeries" class="hidden">
                     <p class="text-xs text-red-500 font-bold mb-2">SELECCIONA EPISODIO:</p>
                     <div id="listaTemps" class="flex gap-2 overflow-x-auto mb-4 pb-2"></div>
                     <div id="listaEps" class="space-y-1 max-h-[200px] overflow-y-auto pr-2"></div>
                 </div>
-
                 <button id="btnPeli" class="bg-red-600 w-full py-4 rounded-xl font-black hidden hover:bg-red-700 transition">
                     REPRODUCIR PELÍCULA
                 </button>
@@ -175,31 +165,32 @@
             cambiarSeccion('trending/all/day', 'Inicio'); 
         };
 
-        // Función de Motores Actualizada para forzar Audio Español
+        // CORRECCIÓN: Parámetros forzados para Español Latino
         function cambiarMotor(num) {
             const { id, tipo, s, e } = currentMedia;
             let url = "";
             
-            // Actualizar UI de botones
             [1,2,3].forEach(n => {
                 const btn = document.getElementById(`btnM${n}`);
                 if(btn) btn.classList.remove('active');
             });
             document.getElementById(`btnM${num}`).classList.add('active');
 
-            // Configuración de URLs con parámetros de idioma forzados
+            // Parámetros: 
+            // lang=es (Español general)
+            // audio_lang=es / native_lang=1 (Instrucción de pista de audio primaria)
             if(num === 1) {
                 url = tipo === 'movie' 
-                    ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es&lang=es` 
-                    : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es&lang=es`;
+                    ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es&lang=es&audio_lang=es` 
+                    : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es&lang=es&audio_lang=es`;
             } else if (num === 2) {
                 url = tipo === 'movie'
-                    ? `https://vidsrc.xyz/embed/movie?tmdb=${id}&lang=es&audio_lang=es`
-                    : `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es&audio_lang=es`;
+                    ? `https://vidsrc.xyz/embed/movie?tmdb=${id}&lang=es&audio_lang=es&native_lang=1`
+                    : `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es&audio_lang=es&native_lang=1`;
             } else {
                 url = tipo === 'movie'
-                    ? `https://vidsrc.me/embed/movie?tmdb=${id}&lang=es`
-                    : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es`;
+                    ? `https://vidsrc.me/embed/movie?tmdb=${id}&lang=es&audio_lang=es`
+                    : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es&audio_lang=es`;
             }
 
             document.getElementById('videoIframe').src = url;
@@ -353,7 +344,6 @@
             }
         });
 
-        // Cerrar menú de perfiles si se hace clic fuera
         window.onclick = function(event) {
             if (!event.target.matches('.w-9, .w-10, .bg-red-600')) {
                 const m = document.getElementById('menuPerfiles');
