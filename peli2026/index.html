@@ -85,7 +85,7 @@
         </div>
         
         <div class="flex items-center gap-2 md:gap-4">
-            <input type="text" id="mainSearch" placeholder="Buscar..." class="search-input">
+            <input type="text" id="mainSearch" placeholder="Buscar en Latino..." class="search-input">
             <button onclick="toggleKids()" id="btnKids" class="bg-blue-600 px-3 md:px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black border border-white/10 shrink-0">KIDS</button>
             <div onclick="toggleMenuPerfiles()" class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-red-600 flex items-center justify-center font-black cursor-pointer shadow-lg border-2 border-white/20 shrink-0">K</div>
             <div id="menuPerfiles">
@@ -115,22 +115,22 @@
     <div id="player" class="fixed inset-0 z-[200] bg-black hidden flex flex-col">
         <div class="p-3 flex flex-wrap justify-between items-center bg-[#0a0a0a] border-b border-white/5 gap-2">
             <div class="flex items-center gap-4">
-                <span class="font-black text-red-600 hidden sm:inline">KARCHY PLAYER</span>
+                <span class="font-black text-red-600 hidden sm:inline italic">KARCHY PLAYER v2</span>
                 <div id="controlesPlayer" class="flex gap-2">
-                    <button onclick="cambiarMotor(1)" id="btnM1" class="btn-servidor active">LATINO 1</button>
+                    <button onclick="cambiarMotor(1)" id="btnM1" class="btn-servidor active">LATINO PREMIUM</button>
                     <button onclick="cambiarMotor(2)" id="btnM2" class="btn-servidor">LATINO 2</button>
-                    <button onclick="cambiarMotor(3)" id="btnM3" class="btn-servidor">LATINO 3 (Multi)</button>
+                    <button onclick="cambiarMotor(3)" id="btnM3" class="btn-servidor">MULTI (ES)</button>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <span class="text-[9px] text-green-500 font-bold uppercase animate-pulse">
-                    <i class="fa fa-check"></i> PRIORIDAD: ESPAÑOL LATINO
+                <span class="text-[10px] text-green-500 font-black uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                    <i class="fa fa-language"></i> Audio: Español Latino
                 </span>
                 <button onclick="cerrarPlayer()" class="bg-white/10 hover:bg-red-600 text-white px-5 py-1.5 rounded-full text-[10px] font-black transition">SALIR</button>
             </div>
         </div>
         <div class="flex-1 bg-black">
-            <iframe id="videoIframe" src="" class="w-full h-full border-0" allowfullscreen></iframe>
+            <iframe id="videoIframe" src="" class="w-full h-full border-0" allowfullscreen allow="autoplay"></iframe>
         </div>
     </div>
 
@@ -142,13 +142,14 @@
                     <h2 id="modalTitle" class="text-3xl font-black italic uppercase">Título</h2>
                     <button onclick="cerrarModal()" class="text-3xl text-zinc-600">&times;</button>
                 </div>
+                <p id="modalInfo" class="text-zinc-500 text-xs mb-4"></p>
                 <div id="contSeries" class="hidden">
-                    <p class="text-xs text-red-500 font-bold mb-2">SELECCIONA EPISODIO:</p>
+                    <p class="text-xs text-red-500 font-bold mb-2">SELECCIONA EPISODIO (AUDIO LATINO):</p>
                     <div id="listaTemps" class="flex gap-2 overflow-x-auto mb-4 pb-2"></div>
                     <div id="listaEps" class="space-y-1 max-h-[200px] overflow-y-auto pr-2"></div>
                 </div>
                 <button id="btnPeli" class="bg-red-600 w-full py-4 rounded-xl font-black hidden hover:bg-red-700 transition">
-                    REPRODUCIR PELÍCULA
+                    VER PELÍCULA EN LATINO
                 </button>
             </div>
         </div>
@@ -165,32 +166,27 @@
             cambiarSeccion('trending/all/day', 'Inicio'); 
         };
 
-        // CORRECCIÓN: Parámetros forzados para Español Latino
+        // LÓGICA DE REPRODUCTOR MEJORADA PARA LATINO
         function cambiarMotor(num) {
             const { id, tipo, s, e } = currentMedia;
             let url = "";
             
-            [1,2,3].forEach(n => {
-                const btn = document.getElementById(`btnM${n}`);
-                if(btn) btn.classList.remove('active');
-            });
+            document.querySelectorAll('.btn-servidor').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btnM${num}`).classList.add('active');
 
-            // Parámetros: 
-            // lang=es (Español general)
-            // audio_lang=es / native_lang=1 (Instrucción de pista de audio primaria)
+            // Parámetros de forzado de idioma: lang=es, audio_lang=es, sub_lang=es
             if(num === 1) {
                 url = tipo === 'movie' 
-                    ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es&lang=es&audio_lang=es` 
-                    : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es&lang=es&audio_lang=es`;
+                    ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es&audio_lang=es` 
+                    : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es&audio_lang=es`;
             } else if (num === 2) {
                 url = tipo === 'movie'
                     ? `https://vidsrc.xyz/embed/movie?tmdb=${id}&lang=es&audio_lang=es&native_lang=1`
                     : `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es&audio_lang=es&native_lang=1`;
             } else {
                 url = tipo === 'movie'
-                    ? `https://vidsrc.me/embed/movie?tmdb=${id}&lang=es&audio_lang=es`
-                    : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es&audio_lang=es`;
+                    ? `https://vidsrc.me/embed/movie?tmdb=${id}&lang=es`
+                    : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}&lang=es`;
             }
 
             document.getElementById('videoIframe').src = url;
@@ -201,6 +197,31 @@
             document.getElementById('player').classList.remove('hidden');
             cambiarMotor(1); 
         }
+
+        // BÚSQUEDA INTELIGENTE CON PRIORIDAD LATINA
+        document.getElementById('mainSearch').addEventListener('keypress', async (e) => {
+            if(e.key === 'Enter') {
+                const query = e.target.value;
+                if(!query) return;
+                
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('sectionTitle').innerText = `Resultados en Latino: ${query}`;
+                
+                try {
+                    // Buscamos con lenguaje español de méxico (latino)
+                    const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}&language=es-MX&include_adult=false`);
+                    const data = await res.json();
+                    
+                    // Filtramos resultados que tengan póster y nombre
+                    const filtrados = data.results.filter(p => p.poster_path);
+                    renderGrid(filtrados);
+                } catch(err) {
+                    console.error("Error en búsqueda:", err);
+                } finally {
+                    document.getElementById('loading').classList.add('hidden');
+                }
+            }
+        });
 
         async function cargarHero() {
             try {
@@ -234,7 +255,10 @@
                 if(!p.poster_path) return;
                 const card = document.createElement('div');
                 card.className = "karchy-card animate-fade-in";
-                card.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${p.poster_path}" class="w-full h-full object-cover" loading="lazy">`;
+                card.innerHTML = `
+                    <img src="https://image.tmdb.org/t/p/w500${p.poster_path}" class="w-full h-full object-cover" loading="lazy">
+                    <div class="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-[8px] font-bold border border-white/20">LAT</div>
+                `;
                 card.onclick = () => abrirDetalles(p.id, p.media_type || (p.first_air_date ? 'tv' : 'movie'));
                 grid.appendChild(card);
             });
@@ -294,13 +318,15 @@
                 isKids = true;
                 document.getElementById('mainBody').classList.add('kids-active');
                 document.getElementById('btnKids').innerText = "ADULTO";
-                cambiarSeccion('discover/movie?with_genres=16,10751', 'Zona Kids');
+                cambiarSeccion('discover/movie?with_genres=16,10751', 'Zona Kids (Latino)');
             } else {
                 if(prompt("PIN Parental (2818):") === "2818") {
                     isKids = false;
                     document.getElementById('mainBody').classList.remove('kids-active');
                     document.getElementById('btnKids').innerText = "KIDS";
                     cambiarSeccion('trending/all/day', 'Inicio');
+                } else {
+                    alert("PIN Incorrecto");
                 }
             }
         }
@@ -314,7 +340,8 @@
                 d.className = "perfil-item";
                 d.innerHTML = `<div class="w-8 h-8 rounded ${p.c}"></div><span class="text-sm font-bold">${p.n}</span>`;
                 d.onclick = () => { 
-                    if(p.n === "Kids") toggleKids(); 
+                    if(p.n === "Kids" && !isKids) toggleKids(); 
+                    else if(p.n === "Karchy" && isKids) toggleKids();
                     document.getElementById('menuPerfiles').style.display='none'; 
                 };
                 container.appendChild(d);
@@ -331,24 +358,6 @@
         function cerrarPlayer() { 
             document.getElementById('player').classList.add('hidden'); 
             document.getElementById('videoIframe').src = ""; 
-        }
-        
-        document.getElementById('mainSearch').addEventListener('keypress', async (e) => {
-            if(e.key === 'Enter') {
-                const q = e.target.value;
-                if(!q) return;
-                const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}&language=es-MX`);
-                const data = await res.json();
-                renderGrid(data.results);
-                document.getElementById('sectionTitle').innerText = `Resultados: ${q}`;
-            }
-        });
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.w-9, .w-10, .bg-red-600')) {
-                const m = document.getElementById('menuPerfiles');
-                if (m && m.style.display === 'block') m.style.display = 'none';
-            }
         }
     </script>
 </body>
