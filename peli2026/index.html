@@ -5,91 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karchy Cinema | Latino</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #080a12; color: white; font-family: 'Inter', sans-serif; }
-        .movie-card:hover { transform: scale(1.05); z-index: 10; }
-        iframe { border-radius: 12px; box-shadow: 0 0 30px rgba(220, 38, 38, 0.2); }
+        body { background: #0a0a0a; color: white; font-family: 'Poppins', sans-serif; }
+        .logo { font-family: 'Bebas Neue', cursive; font-size: 2.5rem; color: #e50914; }
+        .movie-card:hover { transform: scale(1.05); transition: 0.3s; box-shadow: 0 0 20px rgba(229, 9, 20, 0.5); }
+        .btn-latino { background: #e50914; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header class="p-6 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 flex flex-col md:flex-row justify-between items-center border-b border-red-600/30">
-        <div class="text-3xl font-black text-red-600 tracking-tighter mb-4 md:mb-0">
-            KARCHY<span class="text-white">CINEMA.COM</span>
-        </div>
-        <input id="search" type="text" placeholder="Buscar película en Latino..." 
-            class="bg-slate-800 border border-slate-700 px-6 py-2 rounded-full w-full md:w-96 focus:ring-2 focus:ring-red-600 outline-none">
-    </header>
+    <nav class="p-6 bg-black flex flex-col md:flex-row justify-between items-center border-b border-zinc-800">
+        <div class="logo">KARCHY <span class="text-white">CINEMA</span></div>
+        <input id="search" type="text" placeholder="Buscar película..." class="bg-zinc-900 border border-zinc-700 px-6 py-2 rounded-full w-full md:w-80 outline-none focus:border-red-600 mt-4 md:mt-0">
+    </nav>
 
-    <div id="player-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex-col items-center justify-center p-4">
-        <button onclick="closePlayer()" class="absolute top-6 right-6 text-5xl hover:text-red-600">&times;</button>
-        <div class="w-full max-w-5xl aspect-video relative">
-            <iframe id="video-iframe" src="" class="w-full h-full" allowfullscreen></iframe>
+    <div id="player-modal" class="fixed inset-0 bg-black/98 z-[100] hidden flex-col items-center justify-center p-4">
+        <div class="w-full max-w-5xl flex justify-between items-center mb-4">
+            <h2 id="video-title" class="text-2xl font-bold"></h2>
+            <button onclick="closePlayer()" class="text-4xl">&times;</button>
         </div>
-        <h2 id="video-title" class="mt-6 text-2xl font-bold text-red-500"></h2>
-        <p class="text-slate-400 text-sm mt-2">Sugerencia: Si el audio está en inglés, busca el botón 'CC' o 'Audio' en el reproductor.</p>
-    </div>
+        
+        <div class="bg-red-600/20 border border-red-600 p-3 mb-4 rounded text-sm text-center max-w-5xl w-full">
+            ⚠️ <b>PARA AUDIO LATINO:</b> Haz clic en el icono de <b>Ajustes (engranaje)</b> o <b>"CC/Audio"</b> dentro del video y selecciona <b>"Spanish"</b> o <b>"Latino"</b>.
+        </div>
+
+        <div class="w-full max-w-5xl aspect-video bg-zinc-900 rounded-lg overflow-hidden shadow-2xl">
+            <iframe id="video-iframe" src="" class="w-full h-full" allowfullscreen frameborder="0"></iframe>
+        </div>
+    </nav>
 
     <main class="p-8">
-        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="w-2 h-6 bg-red-600 rounded-full"></span> Estrenos en Español Latino
-        </h2>
-        <div id="movie-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            </div>
+        <h2 class="text-xl mb-6 font-bold border-l-4 border-red-600 pl-3">Películas Sugeridas</h2>
+        <div id="movie-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
     </main>
 
     <script>
         const API_KEY = 'fd07a628a3e0f6b9a4dffb579c306fbf';
         const grid = document.getElementById('movie-grid');
 
-        // Cargar películas usando tu API KEY
         async function fetchMovies(query = '') {
-            const lang = 'es-MX'; // Forzar Español Latino
-            let url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${lang}&sort_by=popularity.desc`;
+            // Forzamos TMDB a que nos dé la info en Español México (Latino)
+            let url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=popularity.desc`;
+            if(query) url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${query}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
             
-            if(query) {
-                url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=${lang}&query=${encodeURIComponent(query)}`;
-            }
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                render(data.results);
-            } catch (e) { console.error("Error:", e); }
-        }
-
-        function render(movies) {
-            grid.innerHTML = movies.map(m => m.poster_path ? `
-                <div class="movie-card transition-all duration-300 cursor-pointer" onclick="openPlayer(${m.id}, '${m.title.replace(/'/g, "\\'")}')">
-                    <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" class="rounded-lg shadow-xl border border-slate-800">
-                    <h3 class="mt-3 text-sm font-bold truncate">${m.title}</h3>
-                    <p class="text-xs text-slate-500">${m.release_date ? m.release_date.split('-')[0] : ''}</p>
+            grid.innerHTML = data.results.map(m => m.poster_path ? `
+                <div class="movie-card bg-zinc-900 rounded-lg overflow-hidden cursor-pointer" onclick="openPlayer(${m.id}, '${m.title}')">
+                    <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" class="w-full h-auto">
+                    <div class="p-2 text-xs font-bold truncate text-center">${m.title}</div>
                 </div>
             ` : '').join('');
         }
 
         function openPlayer(id, title) {
-            const modal = document.getElementById('player-modal');
-            const iframe = document.getElementById('video-iframe');
             document.getElementById('video-title').innerText = title;
-            
-            // Usamos un proveedor que suele tener opciones en español latino
-            // Si este falla, se puede probar con: https://vidsrc.to/embed/movie/${id}
-            iframe.src = `https://vidsrc.xyz/embed/movie?tmdb=${id}`;
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            // Usamos vidsrc.pro que suele tener mejores opciones de pistas de audio
+            document.getElementById('video-iframe').src = `https://vidsrc.pro/embed/movie/${id}`;
+            document.getElementById('player-modal').classList.replace('hidden', 'flex');
         }
 
         function closePlayer() {
-            const modal = document.getElementById('player-modal');
             document.getElementById('video-iframe').src = '';
-            modal.classList.add('hidden');
+            document.getElementById('player-modal').classList.replace('flex', 'hidden');
         }
 
         document.getElementById('search').addEventListener('input', (e) => fetchMovies(e.target.value));
-        
-        // Carga inicial
         fetchMovies();
     </script>
 </body>
