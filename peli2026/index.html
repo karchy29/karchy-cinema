@@ -5,16 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Karchy Cinema | Tu Cine en Casa Gratis</title>
-    <meta name="description" content="Disfruta de las mejores películas y series en Karchy Cinema. La mejor experiencia de streaming para toda la familia con modo Kids incluido.">
-    <meta name="keywords" content="Karchy Cinema, ver peliculas gratis, estrenos, modo kids, cine en casa, karchy">
-    <meta name="author" content="Karchy">
-    <link rel="canonical" href="https://karchy-cinema.vercel.app">
-
-    <meta property="og:title" content="Karchy Cinema">
-    <meta property="og:description" content="Entra a Karchy Cinema y disfruta del mejor contenido.">
-    <meta property="og:image" content="karchy imagen.jpg">
-    <meta property="og:type" content="website">
-
+    <meta name="description" content="Disfruta de las mejores películas y series en Karchy Cinema.">
     <link rel="icon" type="image/png" href="karchy imagen.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -22,325 +13,355 @@
 
     <style>
         :root { --karchy-red: #e50914; --karchy-dark: #020202; }
-        body { background: var(--karchy-dark); color: white; font-family: 'Inter', sans-serif; margin:0; overflow-x: hidden; }
+        body { background: var(--karchy-dark); color: white; font-family: 'Inter', sans-serif; margin:0; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* Scrollbar Personalizado */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: var(--karchy-red); border-radius: 10px; }
+
         nav { background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); backdrop-filter: blur(10px); z-index: 100; transition: 0.3s; }
         .nav-active { background: rgba(0,0,0,0.95); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .hero-banner { height: 75vh; background-size: cover; background-position: center; display: flex; align-items: center; position: relative; transition: 0.5s; }
+        
+        .hero-banner { height: 85vh; background-size: cover; background-position: center; display: flex; align-items: center; position: relative; transition: 0.5s; }
         .hero-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--karchy-dark) 5%, transparent 95%); }
-        .karchy-card { cursor: pointer; transition: 0.3s; border-radius: 12px; overflow: hidden; background: #111; aspect-ratio: 2/3; }
-        .karchy-card:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(229, 9, 20, 0.6); z-index: 10; }
+        
+        .karchy-card { cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 12px; overflow: hidden; background: #111; aspect-ratio: 2/3; position: relative; }
+        .karchy-card:hover { transform: scale(1.08); box-shadow: 0 0 30px rgba(229, 9, 20, 0.6); z-index: 10; }
+        .karchy-card img { width: 100%; height: 100%; object-cover: cover; }
+        
+        /* Badge de Calidad/Año */
+        .card-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
+
         #menuPerfiles { display: none; position: absolute; top: 65px; right: 20px; background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; width: 280px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .perfil-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
         .perfil-item:hover { background: rgba(255,255,255,0.08); }
+        
         .avatar { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
         .kids-active { background: #004d7a !important; }
-        .search-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 6px 15px; border-radius: 20px; outline: none; transition: 0.3s; width: 100px; font-size: 12px; }
-        .search-input:focus { width: 180px; border-color: var(--karchy-red); background: rgba(0,0,0,0.5); }
-        .server-btn { background: #222; padding: 5px 15px; border-radius: 5px; font-size: 10px; font-weight: bold; border: 1px solid #444; transition: 0.3s; }
-        .server-btn.active { background: var(--karchy-red); border-color: var(--karchy-red); }
+        
+        .search-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; outline: none; transition: 0.3s; width: 150px; font-size: 12px; color: white; }
+        .search-input:focus { width: 250px; border-color: var(--karchy-red); background: rgba(0,0,0,0.8); }
+        
+        .server-btn { background: #1a1a1a; padding: 10px 20px; border-radius: 8px; font-size: 11px; font-weight: 900; border: 1px solid #333; transition: 0.3s; color: #ccc; text-transform: uppercase; }
+        .server-btn.active { background: var(--karchy-red); border-color: white; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
+        
+        /* Animaciones */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
     </style>
 </head>
 <body id="mainBody">
 
-    <nav id="navbar" class="fixed w-full p-4 lg:px-12 flex justify-between items-center">
+    <nav id="navbar" class="fixed w-full p-4 lg:px-12 flex justify-between items-center transition-all duration-300">
         <div class="flex items-center gap-6">
-            <h1 class="text-2xl font-black text-red-600 tracking-tighter cursor-pointer" onclick="location.reload()">KARCHY</h1>
-            <div class="flex gap-4 md:gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
-                <a href="#" onclick="cambiarSeccion('trending/all/day', 'Inicio')" class="hover:text-red-600">Inicio</a>
-                <a href="#" onclick="cambiarSeccion('discover/movie', 'Películas')" class="hover:text-red-600">Películas</a>
-                <a href="#" onclick="cambiarSeccion('tv/popular', 'Series')" class="hover:text-red-600">Series</a>
+            <h1 class="text-3xl font-black text-red-600 tracking-tighter cursor-pointer hover:scale-105 transition" onclick="location.reload()">KARCHY</h1>
+            <div class="flex gap-4 md:gap-8 text-[11px] font-black uppercase tracking-[0.2em]">
+                <a href="#" onclick="cambiarSeccion('trending/all/day', 'Inicio')" class="hover:text-red-600 transition">Inicio</a>
+                <a href="#" onclick="cambiarSeccion('discover/movie', 'Películas')" class="hover:text-red-600 transition">Películas</a>
+                <a href="#" onclick="cambiarSeccion('tv/popular', 'Series')" class="hover:text-red-600 transition">Series</a>
+                <a href="#" onclick="mostrarFavoritos()" class="text-yellow-500 hover:text-white transition hidden md:block">Favoritos</a>
             </div>
         </div>
         
         <div class="flex items-center gap-3 relative">
             <div class="relative hidden sm:flex items-center">
                 <i class="fa fa-search absolute left-3 text-zinc-400 text-[10px]"></i>
-                <input type="text" id="mainSearch" placeholder="Buscar..." class="search-input pl-8 text-white">
+                <input type="text" id="mainSearch" placeholder="Buscar película..." class="search-input pl-10">
             </div>
-            <button onclick="toggleKids()" id="btnKids" class="bg-zinc-800 px-3 py-1.5 rounded-full text-[9px] font-black border border-white/10 hover:bg-yellow-500 hover:text-black transition">KIDS</button>
-            <div onclick="toggleMenuPerfiles()" id="userMainBtn" class="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center font-black cursor-pointer shadow-lg hover:scale-110 transition border-2 border-white/10">K</div>
+            <button onclick="toggleKids()" id="btnKids" class="bg-zinc-800 px-4 py-2 rounded-full text-[10px] font-black border border-white/10 hover:bg-yellow-500 hover:text-black transition">MODO KIDS</button>
+            <div onclick="toggleMenuPerfiles()" id="userMainBtn" class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center font-black cursor-pointer shadow-lg hover:scale-110 transition border-2 border-white/20">K</div>
+            
             <div id="menuPerfiles">
-                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 text-center">Cambiar Perfil</p>
+                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 text-center">Gestionar Perfiles</p>
                 <div id="contenedorPerfiles"></div>
+                <hr class="my-4 border-white/5">
+                <button onclick="borrarHistorial()" class="w-full text-[10px] font-bold text-zinc-400 hover:text-red-500 transition">Limpiar Historial</button>
             </div>
         </div>
     </nav>
 
     <header id="hero" class="hero-banner">
-        <div class="relative z-10 px-8 lg:px-20 max-w-4xl">
-            <h1 id="heroTitle" class="text-5xl lg:text-7xl font-black italic uppercase leading-tight mb-4 text-white">KARCHY CINEMA</h1>
-            <p id="heroDesc" class="text-zinc-300 text-base mb-8 line-clamp-3 font-light max-w-2xl"></p>
-            <div class="flex gap-4">
-                <button id="heroBtn" class="bg-red-600 px-8 py-3 rounded-md font-black hover:bg-white hover:text-red-600 transition flex items-center gap-3">
-                    <i class="fa fa-play text-sm"></i> REPRODUCIR
+        <div class="relative z-10 px-8 lg:px-20 max-w-4xl pt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-red-600 text-[10px] font-black px-2 py-1 rounded">ESTRENO</span>
+                <span id="heroYear" class="text-zinc-400 text-sm font-bold">2026</span>
+            </div>
+            <h1 id="heroTitle" class="text-6xl lg:text-8xl font-black italic uppercase leading-none mb-6 text-white drop-shadow-2xl">KARCHY CINEMA</h1>
+            <p id="heroDesc" class="text-zinc-300 text-lg mb-8 line-clamp-3 font-light max-w-2xl leading-relaxed"></p>
+            <div class="flex flex-wrap gap-4">
+                <button id="heroBtn" class="bg-red-600 px-10 py-4 rounded-md font-black hover:bg-white hover:text-red-600 transition flex items-center gap-3 shadow-xl">
+                    <i class="fa fa-play"></i> REPRODUCIR AHORA
                 </button>
-                <button onclick="sorpresa()" class="bg-white/10 backdrop-blur-md px-8 py-3 rounded-md font-bold hover:bg-white/20 transition flex items-center gap-3">
-                    <i class="fa fa-shuffle text-yellow-500"></i> ALEATORIO
+                <button onclick="sorpresa()" class="bg-white/10 backdrop-blur-md px-10 py-4 rounded-md font-bold hover:bg-white/20 transition flex items-center gap-3">
+                    <i class="fa fa-shuffle text-yellow-500"></i> ¿QUÉ VEMOS?
                 </button>
             </div>
         </div>
     </header>
 
     <main class="p-8 lg:px-20 relative z-20">
-        <h2 id="sectionTitle" class="text-lg font-black uppercase tracking-widest mb-10 border-l-4 border-red-600 pl-4">Recomendados</h2>
+        <div id="historialSection" class="hidden mb-12">
+            <h2 class="text-lg font-black uppercase tracking-widest mb-6 border-l-4 border-blue-500 pl-4">Continuar viendo</h2>
+            <div id="gridHistorial" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+        </div>
+
+        <h2 id="sectionTitle" class="text-lg font-black uppercase tracking-widest mb-10 border-l-4 border-red-600 pl-4">Tendencias de Hoy</h2>
         <div id="gridPeliculas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
         <div id="loading" class="py-20 text-center hidden"><i class="fa fa-circle-notch fa-spin text-red-600 text-4xl"></i></div>
     </main>
 
-    <div id="modalDetalles" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-        <div class="modal-detalles w-full max-w-5xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col lg:flex-row bg-[#0a0a0a]">
-             <div id="modalImg" class="w-full lg:w-2/5 bg-cover bg-center min-h-[350px]"></div>
-             <div class="p-8 flex-1 overflow-y-auto">
+    <div id="modalDetalles" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+        <div class="w-full max-w-5xl max-h-[90vh] rounded-3xl overflow-hidden flex flex-col lg:flex-row bg-[#0d0d0d] shadow-2xl border border-white/5">
+             <div id="modalImg" class="w-full lg:w-2/5 bg-cover bg-center min-h-[400px]"></div>
+             <div class="p-10 flex-1 overflow-y-auto">
                  <div class="flex justify-between items-start mb-6">
-                     <h2 id="modalTitle" class="text-3xl font-black uppercase italic text-white">Título</h2>
-                     <button onclick="cerrarModal()" class="text-4xl text-zinc-500 hover:text-red-600 transition">&times;</button>
+                     <div>
+                        <h2 id="modalTitle" class="text-4xl font-black uppercase italic text-white mb-2">Título</h2>
+                        <p id="modalInfo" class="text-zinc-500 text-xs font-bold uppercase tracking-widest"></p>
+                     </div>
+                     <button onclick="cerrarModal()" class="text-4xl text-zinc-600 hover:text-red-600 transition">&times;</button>
                  </div>
+                 
+                 <p id="modalPlot" class="text-zinc-400 text-sm leading-relaxed mb-8"></p>
+
                  <div id="contSeries" class="hidden">
-                     <div id="listaTemps" class="flex gap-2 overflow-x-auto mb-6 pb-2 scrollbar-hide"></div>
-                     <div id="listaEps" class="space-y-1 max-h-[300px] overflow-y-auto"></div>
+                     <p class="text-[10px] font-black text-red-600 mb-3 tracking-widest uppercase">Selecciona Temporada y Capítulo:</p>
+                     <div id="listaTemps" class="flex gap-2 overflow-x-auto mb-6 pb-2"></div>
+                     <div id="listaEps" class="space-y-1 max-h-[250px] overflow-y-auto pr-2"></div>
                  </div>
-                 <button id="btnPeli" class="bg-red-600 w-full py-4 rounded-xl font-black hidden hover:bg-red-700 transition uppercase tracking-widest">Ver Película Ahora</button>
+                 
+                 <div class="flex gap-4">
+                    <button id="btnPeli" class="bg-red-600 flex-1 py-5 rounded-2xl font-black hidden hover:bg-white hover:text-red-600 transition uppercase tracking-widest shadow-lg">Comenzar Película</button>
+                    <button id="btnFav" class="bg-zinc-800 px-6 rounded-2xl hover:text-yellow-500 transition"><i class="fa fa-bookmark"></i></button>
+                 </div>
              </div>
         </div>
     </div>
 
     <div id="player" class="fixed inset-0 z-[200] bg-black hidden flex flex-col">
         <div class="p-4 flex flex-wrap justify-between items-center bg-[#050505] border-b border-white/5 gap-4">
-            <div class="flex items-center gap-4">
-                <span class="font-black text-red-600 tracking-tighter">KARCHY PLAYER</span>
-                <div id="selectorServidores" class="flex gap-2">
-                    </div>
+            <div class="flex items-center gap-6">
+                <span class="font-black text-red-600 tracking-tighter text-xl">KARCHY CINEMA</span>
+                <div id="selectorServidores" class="flex gap-3"></div>
             </div>
             <div class="flex items-center gap-4">
-                <span class="hidden md:block text-[9px] text-zinc-500 uppercase font-bold tracking-widest italic">Si no está en español, probá otro servidor</span>
-                <button onclick="cerrarPlayer()" class="bg-zinc-800 hover:bg-red-600 text-white px-6 py-2 rounded-full text-[10px] font-black transition">CERRAR</button>
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-green-500 font-black uppercase tracking-widest">Servidor Activo</span>
+                    <span class="text-[9px] text-zinc-500">Si el audio no es correcto, cambia de opción arriba</span>
+                </div>
+                <button onclick="cerrarPlayer()" class="bg-zinc-800 hover:bg-red-600 text-white px-8 py-2.5 rounded-full text-[10px] font-black transition">SALIR DEL CINE</button>
             </div>
         </div>
         <div class="relative flex-1">
-            <iframe id="videoIframe" src="" class="w-full h-full border-0" allowfullscreen></iframe>
+            <iframe id="videoIframe" src="" class="w-full h-full border-0" allowfullscreen allow="autoplay"></iframe>
         </div>
     </div>
 
     <script>
         const API_KEY = 'fd07a628a3e0f6b9a4dffb579c306fbf';
+        let currentMedia = { id: null, tipo: null, s: 1, e: 1, name: "", poster: "" };
+        let isKids = false;
         let currentPage = 1;
         let currentPath = 'trending/all/day';
         let isFetching = false;
-        let isSearch = false;
-        let isKids = false;
-        let currentMedia = { id: null, tipo: null, s: 1, e: 1 };
 
-        window.onload = () => { renderPerfiles(); cargarHero(); cambiarSeccion('trending/all/day', 'Inicio'); };
-
-        // --- BUSCADOR ---
-        document.getElementById('mainSearch').addEventListener('input', debounce((e) => {
-            const query = e.target.value.trim();
-            if (query.length > 2) {
-                isSearch = true;
-                buscar(query);
-            } else if (query.length === 0) {
-                isSearch = false;
-                cambiarSeccion('trending/all/day', 'Inicio');
-            }
-        }, 500));
-
-        async function buscar(query) {
-            const grid = document.getElementById('gridPeliculas');
-            const loading = document.getElementById('loading');
-            loading.classList.remove('hidden');
-            const term = encodeURIComponent(query);
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${term}&language=es-MX&include_adult=false`);
-                const data = await res.json();
-                renderGrid(data.results, false);
-                document.getElementById('sectionTitle').innerText = `Karchy encontró: ${query}`;
-                if(data.results.length === 0) grid.innerHTML = "<p class='col-span-full text-center py-20 opacity-50 font-black'>NO HAY RESULTADOS.</p>";
-            } catch (error) { console.log(error); }
-            loading.classList.add('hidden');
-        }
-
-        function debounce(func, timeout = 300){
-            let timer;
-            return (...args) => { clearTimeout(timer); timer = setTimeout(() => { func.apply(this, args); }, timeout); };
-        }
-
-        // --- NAVEGACIÓN ---
-        window.onscroll = () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) nav.classList.add('nav-active'); else nav.classList.remove('nav-active');
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                if (!isFetching && !isSearch && !isKids) cargarMasContenido();
-            }
+        window.onload = () => { 
+            renderPerfiles(); 
+            cargarHero(); 
+            cambiarSeccion('trending/all/day', 'Tendencias de Hoy'); 
+            actualizarHistorial();
         };
 
-        async function cambiarSeccion(path, label) {
-            currentPage = 1;
-            currentPath = path;
-            isSearch = false;
-            document.getElementById('mainSearch').value = "";
-            document.getElementById('sectionTitle').innerText = label;
-            document.getElementById('gridPeliculas').innerHTML = "";
-            cargarMasContenido();
+        // --- SISTEMA DE DATOS (HISTORIAL Y FAVS) ---
+        function guardarEnHistorial(media) {
+            let hist = JSON.parse(localStorage.getItem('karchy_historial') || '[]');
+            hist = hist.filter(item => item.id !== media.id);
+            hist.unshift(media);
+            localStorage.setItem('karchy_historial', JSON.stringify(hist.slice(0, 6)));
+            actualizarHistorial();
         }
 
-        async function cargarMasContenido() {
+        function actualizarHistorial() {
+            const hist = JSON.parse(localStorage.getItem('karchy_historial') || '[]');
+            const grid = document.getElementById('gridHistorial');
+            const section = document.getElementById('historialSection');
+            if(hist.length > 0) {
+                section.classList.remove('hidden');
+                grid.innerHTML = "";
+                hist.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = "karchy-card animate-fade-in";
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${p.poster}"><div class="card-badge">VISTO</div>`;
+                    card.onclick = () => abrirDetalles(p.id, p.tipo);
+                    grid.appendChild(card);
+                });
+            } else { section.classList.add('hidden'); }
+        }
+
+        function borrarHistorial() {
+            localStorage.removeItem('karchy_historial');
+            actualizarHistorial();
+            alert("Historial limpio");
+        }
+
+        // --- NAVEGACIÓN Y CARGA ---
+        async function cambiarSeccion(path, label) {
+            currentPath = path;
+            currentPage = 1;
+            document.getElementById('sectionTitle').innerText = label;
+            document.getElementById('gridPeliculas').innerHTML = "";
+            cargarContenido();
+        }
+
+        async function cargarContenido() {
             if(isFetching) return;
             isFetching = true;
             document.getElementById('loading').classList.remove('hidden');
-            try {
-                const url = `https://api.themoviedb.org/3/${currentPath}${currentPath.includes('?') ? '&' : '?'}api_key=${API_KEY}&language=es-MX&page=${currentPage}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                renderGrid(data.results, true);
-                currentPage++;
-            } catch (e) {}
+            const url = `https://api.themoviedb.org/3/${currentPath}${currentPath.includes('?') ? '&' : '?'}api_key=${API_KEY}&language=es-MX&page=${currentPage}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            renderGrid(data.results, true);
             isFetching = false;
             document.getElementById('loading').classList.add('hidden');
         }
 
-        function renderGrid(lista, append = false) {
+        function renderGrid(lista, append) {
             const grid = document.getElementById('gridPeliculas');
-            if (!append) grid.innerHTML = "";
+            if(!append) grid.innerHTML = "";
             lista.forEach(p => {
                 if(!p.poster_path) return;
                 const card = document.createElement('div');
                 card.className = "karchy-card animate-fade-in";
-                card.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${p.poster_path}" loading="lazy" class="w-full h-full object-cover">`;
+                const year = (p.release_date || p.first_air_date || "").split('-')[0];
+                card.innerHTML = `
+                    <img src="https://image.tmdb.org/t/p/w500${p.poster_path}" loading="lazy">
+                    <div class="card-badge">${year || '4K'}</div>
+                `;
                 card.onclick = () => abrirDetalles(p.id, p.media_type || (p.first_air_date ? 'tv' : 'movie'));
                 grid.appendChild(card);
             });
         }
 
-        // --- MODAL Y PLAYER ---
+        // --- DETALLES Y PLAYER ---
         async function abrirDetalles(id, tipo) {
             const res = await fetch(`https://api.themoviedb.org/3/${tipo}/${id}?api_key=${API_KEY}&language=es-MX`);
             const p = await res.json();
-            document.getElementById('modalTitle').innerText = p.title || p.name;
+            currentMedia = { id, tipo, s: 1, e: 1, name: p.title || p.name, poster: p.poster_path };
+            
+            document.getElementById('modalTitle').innerText = currentMedia.name;
+            document.getElementById('modalPlot').innerText = p.overview || "Sin descripción disponible.";
             document.getElementById('modalImg').style.backgroundImage = `url(https://image.tmdb.org/t/p/w500${p.poster_path})`;
+            document.getElementById('modalInfo').innerText = `${tipo === 'movie' ? 'Película' : 'Serie'} • ${p.vote_average.toFixed(1)} ★ • ${p.status}`;
+
             if(tipo === 'movie') {
                 document.getElementById('btnPeli').classList.remove('hidden');
                 document.getElementById('contSeries').classList.add('hidden');
-                document.getElementById('btnPeli').onclick = () => lanzar(id, 'movie');
+                document.getElementById('btnPeli').onclick = () => lanzar();
             } else {
                 document.getElementById('btnPeli').classList.add('hidden');
                 document.getElementById('contSeries').classList.remove('hidden');
-                renderTemps(id, p.number_of_seasons);
+                renderTemporadas(id, p.number_of_seasons);
             }
             document.getElementById('modalDetalles').classList.remove('hidden');
         }
 
-        async function renderTemps(id, n) {
+        async function renderTemporadas(id, n) {
             const div = document.getElementById('listaTemps');
             div.innerHTML = "";
             for(let i=1; i<=n; i++) {
                 const b = document.createElement('button');
-                b.className = "px-5 py-2 bg-zinc-800 rounded-lg text-[10px] font-black shrink-0 hover:bg-red-600";
-                b.innerText = `TEMP ${i}`;
-                b.onclick = () => renderEps(id, i);
+                b.className = "px-6 py-2 bg-zinc-800 rounded-full text-[10px] font-black shrink-0 hover:bg-red-600 transition";
+                b.innerText = `TEMPORADA ${i}`;
+                b.onclick = () => renderEpisodios(id, i);
                 div.appendChild(b);
             }
-            renderEps(id, 1);
+            renderEpisodios(id, 1);
         }
 
-        async function renderEps(id, s) {
+        async function renderEpisodios(id, s) {
+            currentMedia.s = s;
             const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${s}?api_key=${API_KEY}&language=es-MX`);
             const data = await res.json();
             const div = document.getElementById('listaEps');
             div.innerHTML = "";
             data.episodes.forEach(e => {
                 const row = document.createElement('div');
-                row.className = "p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 rounded-xl border-b border-white/5 transition";
-                row.innerHTML = `<span class="text-xs font-medium">${e.episode_number}. ${e.name}</span><i class="fa fa-play text-red-600 text-xs"></i>`;
-                row.onclick = () => lanzar(id, 'tv', s, e.episode_number);
+                row.className = "p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 rounded-xl border-b border-white/5 transition group";
+                row.innerHTML = `<span class="text-xs font-medium text-zinc-400 group-hover:text-white">${e.episode_number}. ${e.name}</span><i class="fa fa-play text-red-600 text-[10px] opacity-0 group-hover:opacity-100"></i>`;
+                row.onclick = () => { currentMedia.e = e.episode_number; lanzar(); };
                 div.appendChild(row);
             });
         }
 
-        function lanzar(id, tipo, s = 1, e = 1) {
-            currentMedia = { id, tipo, s, e };
-            generarBotonesServidores();
-            cambiarServidor(1); // Arranca con el Servidor 1 (vidsrc.xyz)
+        // --- EL SECRETO DEL AUDIO LATINO ---
+        function lanzar() {
+            guardarEnHistorial(currentMedia);
             document.getElementById('player').classList.remove('hidden');
+            generarServidores();
+            cambiarServidor(1);
         }
 
-        function generarBotonesServidores() {
+        function generarServidores() {
             const container = document.getElementById('selectorServidores');
             container.innerHTML = "";
-            // Definimos 3 servidores populares que suelen tener español
             const servers = [
-                { id: 1, name: "Latino/ESP 1" },
-                { id: 2, name: "Latino/ESP 2" },
-                { id: 3, name: "Opcion 3" }
+                { id: 1, name: "Latino 1 (Auto)", icon: "🌎" },
+                { id: 2, name: "Latino 2 (Vidsrc)", icon: "🔥" },
+                { id: 3, name: "Multilenguaje (Ajustes)", icon: "⚙️" }
             ];
-
-            servers.forEach(srv => {
-                const btn = document.createElement('button');
-                btn.id = `srv-${srv.id}`;
-                btn.className = "server-btn";
-                btn.innerText = srv.name;
-                btn.onclick = () => cambiarServidor(srv.id);
-                container.appendChild(btn);
+            servers.forEach(s => {
+                const b = document.createElement('button');
+                b.id = `srv-${s.id}`;
+                b.className = "server-btn";
+                b.innerHTML = `${s.icon} ${s.name}`;
+                b.onclick = () => cambiarServidor(s.id);
+                container.appendChild(b);
             });
         }
 
-        function cambiarServidor(srvId) {
-            // Quitar clase activa de todos
+        function cambiarServidor(num) {
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`srv-${srvId}`).classList.add('active');
-
+            document.getElementById(`srv-${num}`).classList.add('active');
+            
             const { id, tipo, s, e } = currentMedia;
             let url = "";
-
-            // Lógica de URLs para diferentes servidores
-            if (srvId === 1) {
-                url = tipo === 'movie' ? `https://vidsrc.xyz/embed/movie?tmdb=${id}` : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
-            } else if (srvId === 2) {
-                url = tipo === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
-            } else if (srvId === 3) {
-                url = tipo === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`;
+            
+            if(num === 1) {
+                // vidsrc.icu se enfoca mucho en contenido latino por IP
+                url = tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}`;
+            } else if(num === 2) {
+                // vidsrc.cc con parámetro de idioma forzado
+                url = tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es`;
+            } else {
+                // vidsrc.pro permite cambiar audio en la rueda de ajustes del video
+                url = tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`;
             }
-
             document.getElementById('videoIframe').src = url;
         }
 
-        // --- KIDS Y PERFILES ---
+        // --- FUNCIONES EXTRA ---
         function toggleKids() {
             isKids = !isKids;
-            const body = document.getElementById('mainBody');
-            const btn = document.getElementById('btnKids');
-            if (isKids) {
-                body.classList.add('kids-active');
-                btn.innerText = "MODO ADULTO";
-                document.getElementById('sectionTitle').innerText = '🧸 Zona de Peques';
-                cargarKids();
+            document.getElementById('mainBody').classList.toggle('kids-active');
+            if(isKids) {
+                document.getElementById('btnKids').innerText = "MODO ADULTO";
+                cambiarSeccion('discover/movie?with_genres=16,10751', '🍿 Zona Peques');
             } else {
-                body.classList.remove('kids-active');
-                btn.innerText = "MODO KIDS";
-                cambiarSeccion('trending/all/day', 'Inicio');
+                document.getElementById('btnKids').innerText = "MODO KIDS";
+                cambiarSeccion('trending/all/day', 'Tendencias de Hoy');
             }
         }
 
-        async function cargarKids() {
-            const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16,10751&language=es-MX`);
-            const data = await res.json();
-            renderGrid(data.results, false);
+        function sorpresa() {
+            const cards = document.querySelectorAll('#gridPeliculas .karchy-card');
+            cards[Math.floor(Math.random()*cards.length)].click();
         }
 
-        const perfiles = [{ nombre: "Karchy", color: "bg-red-600", letra: "K" }, { nombre: "Kids", color: "bg-yellow-500", letra: "K" }];
-        function renderPerfiles() {
-            const container = document.getElementById('contenedorPerfiles');
-            container.innerHTML = "";
-            perfiles.forEach(p => {
-                const div = document.createElement('div');
-                div.className = "perfil-item";
-                div.innerHTML = `<div class="avatar ${p.color} text-white">${p.letra}</div><span class="text-xs font-bold text-zinc-300">${p.nombre}</span>`;
-                div.onclick = () => {
-                    if(p.nombre === "Kids") !isKids ? toggleKids() : null;
-                    else isKids ? toggleKids() : null;
-                    document.getElementById('menuPerfiles').style.display = 'none';
-                };
-                container.appendChild(div);
-            });
+        function cerrarModal() { document.getElementById('modalDetalles').classList.add('hidden'); }
+        function cerrarPlayer() { 
+            document.getElementById('player').classList.add('hidden'); 
+            document.getElementById('videoIframe').src = ""; 
         }
 
         function toggleMenuPerfiles() {
@@ -348,24 +369,49 @@
             m.style.display = (m.style.display === 'block') ? 'none' : 'block';
         }
 
-        async function cargarHero() {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=es-MX`);
-                const data = await res.json();
-                const p = data.results[0];
-                document.getElementById('hero').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${p.backdrop_path})`;
-                document.getElementById('heroTitle').innerText = p.title || p.name;
-                document.getElementById('heroDesc').innerText = p.overview;
-                document.getElementById('heroBtn').onclick = () => abrirDetalles(p.id, p.media_type);
-            } catch(e) {}
+        function renderPerfiles() {
+            const container = document.getElementById('contenedorPerfiles');
+            const pers = [{ n: "Karchy", c: "bg-red-600" }, { n: "Niños", c: "bg-blue-500" }];
+            pers.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "perfil-item";
+                div.innerHTML = `<div class="avatar ${p.c} text-white">${p.n[0]}</div><span class="text-xs font-bold text-zinc-300">${p.n}</span>`;
+                div.onclick = () => { if(p.n === "Niños" && !isKids) toggleKids(); toggleMenuPerfiles(); };
+                container.appendChild(div);
+            });
         }
 
-        function cerrarModal() { document.getElementById('modalDetalles').classList.add('hidden'); }
-        function cerrarPlayer() { document.getElementById('player').classList.add('hidden'); document.getElementById('videoIframe').src=""; }
-        function sorpresa() {
-            const cards = document.querySelectorAll('.karchy-card');
-            if(cards.length > 0) cards[Math.floor(Math.random()*cards.length)].click();
+        async function cargarHero() {
+            const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=es-MX`);
+            const data = await res.json();
+            const p = data.results[0];
+            document.getElementById('hero').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${p.backdrop_path})`;
+            document.getElementById('heroTitle').innerText = p.title || p.name;
+            document.getElementById('heroDesc').innerText = p.overview;
+            document.getElementById('heroYear').innerText = (p.release_date || p.first_air_date || "").split('-')[0];
+            document.getElementById('heroBtn').onclick = () => abrirDetalles(p.id, p.media_type);
         }
+
+        // Búsqueda en tiempo real
+        document.getElementById('mainSearch').addEventListener('input', async (e) => {
+            const q = e.target.value;
+            if(q.length > 2) {
+                const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}&language=es-MX`);
+                const data = await res.json();
+                renderGrid(data.results, false);
+                document.getElementById('sectionTitle').innerText = `Resultados para: ${q}`;
+            }
+        });
+
+        // Scroll Infinito
+        window.onscroll = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
+                if(!isFetching) { currentPage++; cargarContenido(); }
+            }
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 100) nav.classList.add('nav-active');
+            else nav.classList.remove('nav-active');
+        };
     </script>
 </body>
 </html>
