@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karchy Cinema | Tu Cine en Casa Gratis</title>
     <meta name="description" content="Disfruta de las mejores películas y series en Karchy Cinema.">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="karchy imagen.jpg">
+    
     <link rel="icon" type="image/png" href="karchy imagen.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +21,10 @@
         :root { --karchy-red: #e50914; --karchy-dark: #020202; }
         body { background: var(--karchy-dark); color: white; font-family: 'Inter', sans-serif; margin:0; overflow-x: hidden; scroll-behavior: smooth; }
         
-        /* Scrollbar Estilo Premium */
+        /* Skeleton Loader para carga premium */
+        .skeleton { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: var(--karchy-red); border-radius: 10px; }
@@ -28,7 +38,6 @@
         .karchy-card { cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 12px; overflow: hidden; background: #111; aspect-ratio: 2/3; position: relative; border: 1px solid rgba(255,255,255,0.05); }
         .karchy-card:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(229, 9, 20, 0.4); z-index: 10; border-color: var(--karchy-red); }
         
-        /* Buscador Adaptable */
         .search-wrapper { position: relative; display: flex; align-items: center; }
         .search-input { 
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
@@ -46,7 +55,6 @@
         .server-btn { background: #1a1a1a; padding: 12px 24px; border-radius: 12px; font-size: 11px; font-weight: 900; border: 1px solid #333; transition: 0.3s; color: #ccc; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         .server-btn.active { background: var(--karchy-red); border-color: white; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
 
-        /* Contenedor de Video Mejorado */
         .video-container { position: relative; width: 100%; height: 100%; background: #000; overflow: hidden; }
         
         @media (max-width: 768px) {
@@ -161,9 +169,15 @@
         let currentPath = 'trending/all/day';
         let isFetching = false;
 
+        // Registro de Service Worker para PWA (Instalable)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('https://karchy-cinema-8wakixcfb-karchy29-6001s-projects.vercel.app/sw.js').catch(() => {});
+            });
+        }
+
         window.onload = () => { renderPerfiles(); cargarHero(); cambiarSeccion('trending/all/day', 'Tendencias de Hoy'); actualizarHistorial(); };
 
-        // --- SISTEMA DE DATOS ---
         function guardarEnHistorial(media) {
             let hist = JSON.parse(localStorage.getItem('karchy_historial') || '[]');
             hist = hist.filter(item => item.id !== media.id);
@@ -182,7 +196,7 @@
                 hist.forEach(p => {
                     const card = document.createElement('div');
                     card.className = "karchy-card";
-                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w300${p.poster}" alt="${p.name}" class="w-full h-full object-cover">`;
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${p.poster}" alt="${p.name}" class="w-full h-full object-cover">`;
                     card.onclick = () => abrirDetalles(p.id, p.tipo);
                     grid.appendChild(card);
                 });
@@ -191,7 +205,6 @@
 
         function borrarHistorial() { localStorage.removeItem('karchy_historial'); actualizarHistorial(); }
 
-        // --- NAVEGACIÓN ---
         async function cambiarSeccion(path, label) {
             currentPath = path;
             currentPage = 1;
@@ -218,22 +231,24 @@
             lista.forEach(p => {
                 if(!p.poster_path) return;
                 const card = document.createElement('div');
-                card.className = "karchy-card animate-fade-in";
-                // Usamos w300 para mayor velocidad que LG
-                card.innerHTML = `<img src="https://image.tmdb.org/t/p/w300${p.poster_path}" loading="lazy" class="w-full h-full object-cover">`;
+                card.className = "karchy-card animate-fade-in skeleton";
+                const img = new Image();
+                img.src = `https://image.tmdb.org/t/p/w500${p.poster_path}`;
+                img.className = "w-full h-full object-cover opacity-0 transition-opacity duration-500";
+                img.onload = () => { img.classList.remove('opacity-0'); card.classList.remove('skeleton'); };
+                card.appendChild(img);
                 card.onclick = () => abrirDetalles(p.id, p.media_type || (p.first_air_date ? 'tv' : 'movie'));
                 grid.appendChild(card);
             });
         }
 
-        // --- DETALLES Y PLAYER ---
         async function abrirDetalles(id, tipo) {
             const res = await fetch(`https://api.themoviedb.org/3/${tipo}/${id}?api_key=${API_KEY}&language=es-MX`);
             const p = await res.json();
             currentMedia = { id, tipo, s: 1, e: 1, name: p.title || p.name, poster: p.poster_path };
             
             document.getElementById('modalTitle').innerText = currentMedia.name;
-            document.getElementById('modalPlot').innerText = p.overview || "Sin descripción disponible en este momento.";
+            document.getElementById('modalPlot').innerText = p.overview || "Sin descripción disponible.";
             document.getElementById('modalImg').style.backgroundImage = `url(https://image.tmdb.org/t/p/w500${p.poster_path})`;
 
             if(tipo === 'movie') {
@@ -284,51 +299,36 @@
         function generarServidores() {
             const container = document.getElementById('selectorServidores'); container.innerHTML = "";
             const servers = [
-                { id: 1, name: "Latino 1", icon: "🌎" },
-                { id: 2, name: "Latino 2", icon: "🚀" },
-                { id: 3, name: "España", icon: "🇪🇸" }
+                { id: 1, name: "Latino 1", icon: "🌎", base: "https://vidsrc.cc/v2/embed" },
+                { id: 2, name: "Latino 2", icon: "🚀", base: "https://vidsrc.pro/embed" },
+                { id: 3, name: "España", icon: "🇪🇸", base: "https://vidsrc.me/embed" }
             ];
             servers.forEach(s => {
                 const b = document.createElement('button');
                 b.id = `srv-${s.id}`;
                 b.className = "server-btn";
                 b.innerHTML = `<span>${s.icon}</span> <span>${s.name}</span>`;
-                b.onclick = () => cambiarServidor(s.id);
+                b.onclick = () => cambiarServidor(s.id, s.base);
                 container.appendChild(b);
             });
         }
 
-        function cambiarServidor(num) {
+        function cambiarServidor(num, base = "https://vidsrc.cc/v2/embed") {
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
             const activeBtn = document.getElementById(`srv-${num}`);
             if(activeBtn) activeBtn.classList.add('active');
             
             const { id, tipo, s, e } = currentMedia;
-            let url = "";
+            let url = tipo === 'movie' ? `${base}/movie/${id}` : `${base}/tv/${id}/${s}/${e}`;
             
-            // LÓGICA DE AUDIO Y ANUNCIOS:
-            // Usamos vidsrc.cc con auto_lang=es para forzar latino (Como LG pero con sandbox más estricto)
-            if(num === 1) {
-                url = tipo === 'movie' ? 
-                    `https://vidsrc.cc/v2/embed/movie/${id}?auto_lang=es` : 
-                    `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_lang=es`;
-            } else if(num === 2) {
-                url = tipo === 'movie' ? 
-                    `https://vidsrc.icu/embed/movie/${id}` : 
-                    `https://vidsrc.icu/embed/tv/${id}/${s}/${e}`;
-            } else {
-                url = tipo === 'movie' ? 
-                    `https://vidsrc.pro/embed/movie/${id}` : 
-                    `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`;
-            }
-            
-            // Limpiamos el iframe antes de cargar para evitar scripts residuales
+            // Forzado de idioma latino mediante parámetros de URL
+            url += (base.includes('vidsrc.cc')) ? "?auto_lang=es" : "?lang=es";
+
             const ifr = document.getElementById('videoIframe');
             ifr.src = "";
             setTimeout(() => { ifr.src = url; }, 100);
         }
 
-        // --- FUNCIONES EXTRA ---
         function toggleKids() {
             isKids = !isKids;
             document.getElementById('mainBody').classList.toggle('kids-active');
@@ -349,10 +349,7 @@
         }
 
         function cerrarModal() { document.getElementById('modalDetalles').classList.add('hidden'); }
-        function cerrarPlayer() { 
-            document.getElementById('player').classList.add('hidden'); 
-            document.getElementById('videoIframe').src = ""; 
-        }
+        function cerrarPlayer() { document.getElementById('player').classList.add('hidden'); document.getElementById('videoIframe').src = ""; }
 
         function toggleMenuPerfiles() {
             const m = document.getElementById('menuPerfiles');
@@ -366,11 +363,7 @@
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-4 p-3 hover:bg-white/5 rounded-xl cursor-pointer transition";
                 div.innerHTML = `<div class="avatar ${p.c} text-white">${p.n[0]}</div><span class="text-xs font-bold text-zinc-300">${p.n}</span>`;
-                div.onclick = () => { 
-                    if(p.n === "Niños" && !isKids) toggleKids(); 
-                    if(p.n === "Karchy" && isKids) toggleKids();
-                    toggleMenuPerfiles(); 
-                };
+                div.onclick = () => { if(p.n === "Niños" && !isKids) toggleKids(); if(p.n === "Karchy" && isKids) toggleKids(); toggleMenuPerfiles(); };
                 container.appendChild(div);
             });
         }
@@ -386,7 +379,6 @@
             document.getElementById('heroBtn').onclick = () => abrirDetalles(p.id, p.media_type);
         }
 
-        // Buscador Dinámico
         let timeoutSearch;
         document.getElementById('mainSearch').addEventListener('input', (e) => {
             clearTimeout(timeoutSearch);
